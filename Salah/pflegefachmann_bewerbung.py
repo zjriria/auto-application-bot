@@ -2,9 +2,7 @@ import os
 import time
 import random
 import csv
-import argparse
 import smtplib
-import email.utils
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
@@ -242,13 +240,11 @@ Zakaria Jriria
 
 def send_email(to_email, subject, body, attachment_path, extra_attachments=None, *, max_retries=None, retry_backoff=5.0):
     """Send an email via Gmail SMTP with retry/backoff logic."""
-    msg = MIMEMultipart("mixed")
-    msg['From'] = email.utils.formataddr((MY_NAME, GMAIL_USER))
+    msg = MIMEMultipart()
+    msg['From'] = GMAIL_USER
     msg['To'] = to_email
-    msg['Reply-To'] = email.utils.formataddr((MY_NAME, GMAIL_USER))
-    msg['Date'] = email.utils.formatdate(localtime=True)
-    msg['Message-ID'] = email.utils.make_msgid(domain=EMAIL_DOMAIN)
-    msg['MIME-Version'] = '1.0'
+    msg['Reply-To'] = GMAIL_USER
+    msg['Bcc'] = GMAIL_USER  # BCC yourself
     msg['Subject'] = subject
     msg['X-Mailer'] = "Pflegefachmann-AutoMailer/2.0"
 
@@ -282,7 +278,7 @@ def send_email(to_email, subject, body, attachment_path, extra_attachments=None,
             if USE_OAUTH:
                 # Use OAuth2 for Hotmail/Outlook accounts
                 server = outlook_oauth.smtp_connect_oauth(GMAIL_USER)
-                server.send_message(msg, from_addr=GMAIL_USER, to_addrs=[to_email])
+                server.send_message(msg)
                 server.quit()
                 return True
             else:
@@ -301,7 +297,7 @@ def send_email(to_email, subject, body, attachment_path, extra_attachments=None,
                             server.ehlo()
 
                         server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
-                        server.send_message(msg, from_addr=GMAIL_USER, to_addrs=[to_email])
+                        server.send_message(msg)
                         server.quit()
                         return True
                     except Exception as transport_exc:
@@ -327,16 +323,7 @@ def send_email(to_email, subject, body, attachment_path, extra_attachments=None,
 def main():
     print("=== Pflegefachmann Bewerbungs-Roboter ===")
     
-    # Parse command-line arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--input', default=None, help='Input CSV/Excel file with leads')
-    parser.add_argument('--sent-log', default='applications_sent.csv', help='Sent history log file')
-    args = parser.parse_args()
-    
-    # Determine clinics file
-    if args.input:
-        clinics_file = args.input
-    elif os.path.exists("converted_output.csv"):
+    if os.path.exists("converted_output.csv"):
         clinics_file = "converted_output.csv"
     elif os.path.exists("input.xlsx"):
         clinics_file = "input.xlsx"
@@ -373,7 +360,7 @@ def main():
     primary_attachment, extra_attachments = get_ordered_attachments()
         
     # 2. Track already sent (CSV)
-    sent_file = args.sent_log
+    sent_file = "applications_sent.csv"
     sent_emails = set()
     
     if os.path.exists(sent_file):

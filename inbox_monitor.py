@@ -9,7 +9,7 @@ import pandas as pd
 
 load_dotenv()
 
-GMAIL_USER = os.getenv("GMAIL_USER", "zakariaejriria@gmail.com")
+GMAIL_USER = os.getenv("GMAIL_USER", "ziiko20-maroco@hotmail.com")
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD")
 SENT_FILE = "applications_sent.csv"
 
