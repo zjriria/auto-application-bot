@@ -2,6 +2,18 @@
 *.pdf
 *.xlsx
 *.csv
+*.db
+*.log
+*.tmp
+.outlook_token_cache.json
+live_status.json
+scratch_search*.json
 __pycache__/
-.venv/
-__pycache__
+.venv*/
+.vscode/
+
+# Ignore scripts with hardcoded secrets (unless sanitized)
+outlook_oauth.py
+test_oauth_config.py
+smtp_probe.py
+
