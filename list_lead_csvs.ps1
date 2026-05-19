@@ -1,0 +1,1 @@
+Get-ChildItem -File | Where-Object { $_.Name -match 'informatiker|pflege' -and $_.Name -like '*.csv' } | Select-Object -ExpandProperty Name

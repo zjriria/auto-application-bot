@@ -18,6 +18,15 @@ else
     echo "--> No new leads found by the scraper. Using existing data..."
 fi
 
+if [ -f "input.xlsx" ]; then
+    echo "--> Cleaning and validating emails before sending..."
+    python prepare_leads.py --input input.xlsx --output converted_output.csv --sent-log applications_sent.csv --city-label Sachsen
+elif [ -f "converted_output.csv" ]; then
+    echo "--> Existing converted_output.csv found. Reusing cleaned leads."
+else
+    echo "--> WARNING: No input.xlsx or converted_output.csv found."
+fi
+
 echo "--> [3/3] Generating AI Cover Letters & Sending Emails..."
 python pflegefachmann_bewerbung.py
 
